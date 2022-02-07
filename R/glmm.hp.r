@@ -1,14 +1,11 @@
 #' Hierarchical Partitioning of Marginal R2 for Generalized Mixed-Effect Models
 
 #' @param  mod  Fitted lme4 or nlme model objects.
-#' @param  commonality Logical; If TRUE, the result of commonality analysis (2^N-1 fractions for N predictors) is shown, the default is FALSE.
 
-#' @details This function conducts commonality analysis and hierarchical partitioning to calculate the unique, average shared (referred as to "common") and individual contributions of each predictor (or matrix) towards marginal R2 for Generalized Mixed-effect Model. The marginal R2 can be calculated by r.squaredGLMM in MuMIn package.
-#' Commonality analysis should be conducted before hierarchical partitioning. The former emphasizes unique and common variation among predictors, the latter emphasizes the overall importance of each predictor. This function simultaneously implements commonality analysis and hierarchical partitioning for marginal R2 without limiting in the number of predictors. 
+#' @details This function conducts hierarchical partitioning to calculate the individual contributions of each predictor towards marginal R2 for Generalized Mixed-effect Model. The marginal R2 is the output of r.squaredGLMM in MuMIn package.
 
 #' @return \item{Total.Marginal.R2}{The marginal R2 (fixed effect) for the full model.}
-#' @return \item{commonality}{If commonality=TRUE, a matrix containing the value and percentage of all commonality (2^N-1 for N predictors).}
-#' @return \item{Hier.part}{A matrix containing unique, average shared, individual effects and percentage of individual effects towards total marginal R2 for each predictor.}
+#' @return \item{Hier.part}{A matrix containing individual effects and percentage of individual effects towards total marginal R2 for each predictor.}
 
 #' @author {Jiangshan Lai} \email{lai@ibcas.ac.cn}
 #' @author {Kim Nimon} \email{kim.nimon@gmail.com}
@@ -33,7 +30,7 @@
 #'glmm.hp(mod1)
 #'plot(glmm.hp(mod1))
 
-glmm.hp <- function (mod,commonality=FALSE)
+glmm.hp <- function(mod)
 {
   # initial checks
   if (!inherits(mod, c("merMod","lme"))) stop("glmm.hp only supports lme or merMod objects at the moment")
@@ -60,7 +57,14 @@ glmm.hp <- function (mod,commonality=FALSE)
   for (i in 1:totalN) {
     binarymx <- creatbin(i, binarymx)
   }
-  
+
+outr2  <- r.squaredGLMM(mod)
+r2type  <-  row.names(outr2)
+nr2type   <-  length(r2type)
+if(nr2type==0)
+{nr2type <- 1
+r2type <- 'hierarchical.partitioning'
+}
 #ifelse(class(mod)=="merMod",dat <- eval(mod@call$data),dat <- eval(mod$call$data))
 if(inherits(mod, "merMod"))
 {dat <- eval(mod@call$data)
@@ -75,8 +79,10 @@ if(inherits(mod, "lme"))
 mod_null <- stats::update(object = mod,data=dat,fixed=~1)
 }
 
-
-
+outputList  <- list()
+outputList[[1]] <- outr2
+for (k in 1:nr2type)
+{
   commonM <- matrix(nrow = totalN, ncol = 3)
   for (i in 1:totalN) {
     tmp.name <- iv.name[as.logical(binarymx[, i])]
@@ -91,7 +97,7 @@ mod_null <- stats::update(object = mod,data=dat,fixed=~1)
 	  modnew  <- stats::update(object = mod_null, data = dat,fixed=to_add) 
 	}
 	
-	commonM[i, 2]=MuMIn::r.squaredGLMM(modnew)[1]
+	commonM[i, 2]  <- MuMIn::r.squaredGLMM(modnew)[k,1]
   }
 
   commonlist <- vector("list", totalN)
@@ -193,25 +199,30 @@ mod_null <- stats::update(object = mod,data=dat,fixed=~1)
                              justify = "right")
   dimnames(outputcommonM) <- list(rowNames, colNames)
 
-  VariableImportance <- matrix(nrow = nvar, ncol = 4)
+ # VariableImportance <- matrix(nrow = nvar, ncol = 4)
+ VariableImportance <- matrix(nrow = nvar, ncol = 2)
   for (i in 1:nvar) {
-	VariableImportance[i, 3] <-  round(sum(binarymx[i, ] * (commonM[,3]/apply(binarymx,2,sum))), digits = 4)
+	#VariableImportance[i, 3] <-  round(sum(binarymx[i, ] * (commonM[,3]/apply(binarymx,2,sum))), digits = 4)
+	VariableImportance[i, 1] <-  round(sum(binarymx[i, ] * (commonM[,3]/apply(binarymx,2,sum))), digits = 4)
   }
   
-  VariableImportance[,1] <- outputcommonM[1:nvar,1]
-  VariableImportance[,2] <- VariableImportance[,3]-VariableImportance[,1]
+  #VariableImportance[,1] <- outputcommonM[1:nvar,1]
+ # VariableImportance[,2] <- VariableImportance[,3]-VariableImportance[,1]
   
-  total=round(sum(VariableImportance[,3]),digits = 4)
-  VariableImportance[, 4] <- round(100*VariableImportance[, 3]/total,2)
+  #total=round(sum(VariableImportance[,3]),digits = 4)
+  total=round(sum(VariableImportance[,1]),digits = 4)
+  #VariableImportance[, 4] <- round(100*VariableImportance[, 3]/total,2)
+VariableImportance[, 2] <- round(100*VariableImportance[, 1]/total,2)
+  dimnames(VariableImportance) <- list(iv.name, c("Individual","I.perc(%)"))
 
-  dimnames(VariableImportance) <- list(iv.name, c("Unique","Average.share","Individual","I.perc(%)"))
-
-
-if(commonality)
-{outputList <- list(Total.Marginal.R2=total,commonality = outputcommonM, Hier.part = VariableImportance)}
-else
-{outputList<-list(Total.Marginal.R2=total,Hier.part= VariableImportance)}
-
+#if(commonality)
+#{outputList <- list(Total.Marginal.R2=total,commonality = outputcommonM, Hier.part = VariableImportance)}
+#else
+#{outputList<-list(Total.Marginal.R2=total,Hier.part= VariableImportance)}
+#outputList[[j]]<- list(Total.Marginal.R2=total,Hier.part= VariableImportance)
+outputList[[k+1]]<-VariableImportance
+}
+names(outputList) <- c("r.squaredGLMM",r2type)
 class(outputList) <- "glmmhp" # Class definition
 outputList
 }

@@ -4,26 +4,21 @@
 \alias{glmm.hp}
 \title{Hierarchical Partitioning of Marginal R2 for Generalized Mixed-Effect Models}
 \usage{
-glmm.hp(mod, commonality = FALSE)
+glmm.hp(mod)
 }
 \arguments{
 \item{mod}{Fitted lme4 or nlme model objects.}
-
-\item{commonality}{Logical; If TRUE, the result of commonality analysis (2^N-1 fractions for N predictors) is shown, the default is FALSE.}
 }
 \value{
 \item{Total.Marginal.R2}{The marginal R2 (fixed effect) for the full model.}
 
-\item{commonality}{If commonality=TRUE, a matrix containing the value and percentage of all commonality (2^N-1 for N predictors).}
-
-\item{Hier.part}{A matrix containing unique, average shared, individual effects and percentage of individual effects towards total marginal R2 for each predictor.}
+\item{Hier.part}{A matrix containing individual effects and percentage of individual effects towards total marginal R2 for each predictor.}
 }
 \description{
 Hierarchical Partitioning of Marginal R2 for Generalized Mixed-Effect Models
 }
 \details{
-This function conducts commonality analysis and hierarchical partitioning to calculate the unique, average shared (referred as to "common") and individual contributions of each predictor (or matrix) towards marginal R2 for Generalized Mixed-effect Model. The marginal R2 can be calculated by r.squaredGLMM in MuMIn package.
-Commonality analysis should be conducted before hierarchical partitioning. The former emphasizes unique and common variation among predictors, the latter emphasizes the overall importance of each predictor. This function simultaneously implements commonality analysis and hierarchical partitioning for marginal R2 without limiting in the number of predictors.
+This function conducts hierarchical partitioning to calculate the individual contributions of each predictor towards marginal R2 for Generalized Mixed-effect Model. The marginal R2 is the output of r.squaredGLMM in MuMIn package.
 }
 \examples{
 library(MuMIn)
