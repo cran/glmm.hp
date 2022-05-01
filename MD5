@@ -1,8 +1,8 @@
-be3642c62e7c63f79777a423cb0bac97 *DESCRIPTION
+e14b815a955af8cf21c53fc8412a0530 *DESCRIPTION
 d300e43d94fd3d89043daeb3a33c0ade *NAMESPACE
 ae88989317fa79033f9172d8231cc697 *R/creatbin.r
 8129aeb76d1d15fc7404e5da91011466 *R/genList.r
-3fe36762184f9b913b9e6a921093eaeb *R/glmm.hp.r
+c0cdab48abc7c22225ab0d814ab5c2f1 *R/glmm.hp.r
 94fa18889f0055c8e344b59bc9febbe9 *R/globals.r
 b42b85610cf70ee63cde0789f6c670de *R/plot.glmmhp.r
 8b2bbbee43ac7822dee299cf8ab59a63 *man/creatbin.Rd
