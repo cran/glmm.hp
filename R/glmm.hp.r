@@ -79,7 +79,9 @@ r2type <- 'hierarchical.partitioning'
 }
 #ifelse(class(mod)=="merMod",dat <- eval(mod@call$data),dat <- eval(mod$call$data))
 if(inherits(mod, "merMod"))
-{dat <- na.omit(eval(mod@call$data))
+{dat <- eval(mod@call$data)
+if(sum(is.na(dat[,ivname]))>0){dat <- dat[-which(rowSums(is.na(dat[,ivname]))>0),]} 
+#dat <- na.omit(eval(mod@call$data))
 if(!inherits(dat, "data.frame")){stop("Please change the name of data object in the original (g)lmm analysis then try again.")}
 to_del <- paste(paste("-", iv.name, sep= ""), collapse = " ")
 # reduced formula

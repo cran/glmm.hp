@@ -1,11 +1,11 @@
-6939b1075a7759ee66566afc7f5ca187 *DESCRIPTION
+2fe8e63a2d0b7e29155342c577ce4a8d *DESCRIPTION
 d300e43d94fd3d89043daeb3a33c0ade *NAMESPACE
 ae88989317fa79033f9172d8231cc697 *R/creatbin.r
 8129aeb76d1d15fc7404e5da91011466 *R/genList.r
-96aa40f27d53000c58018468d41fd939 *R/glmm.hp.r
+1fefd3079f1a39a66ecfc0282a370c83 *R/glmm.hp.r
 94fa18889f0055c8e344b59bc9febbe9 *R/globals.r
 f10bc35273f8c4085e6c7ceaa38096e8 *R/plot.glmmhp.r
-c58588ed9d09ccc2e3c89e0f0947e9f2 *inst/CITATION
+d556bac538cff57d4b1ac92634184dcb *inst/CITATION
 8b2bbbee43ac7822dee299cf8ab59a63 *man/creatbin.Rd
 b5eca751aaff29d7f8e5d1c553478955 *man/genList.Rd
 c8c84cc6ea6f35db42758060c983d763 *man/glmm.hp.Rd
