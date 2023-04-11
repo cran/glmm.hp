@@ -7,7 +7,7 @@
 glmm.hp(mod)
 }
 \arguments{
-\item{mod}{Fitted lme4,nlme or glmmTMB model objects.}
+\item{mod}{Fitted lme4,nlme,glmmTMB or glm model objects.}
 }
 \value{
 \item{Total.Marginal.R2}{The marginal R2 (fixed effect) for the full model.}
@@ -27,6 +27,10 @@ mod1 <- lmer(Sepal.Length ~ Petal.Length+Petal.Width +(1 | Species),data = iris)
 r.squaredGLMM(mod1)
 glmm.hp(mod1)
 plot(glmm.hp(mod1))
+mod2 <- glm(Sepal.Length ~ Petal.Length+Petal.Width,data = iris)
+r.squaredGLMM(mod2)
+glmm.hp(mod2)
+plot(glmm.hp(mod2))
 }
 \references{
 \itemize{

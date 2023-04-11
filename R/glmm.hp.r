@@ -1,6 +1,6 @@
 #' Hierarchical Partitioning of Marginal R2 for Generalized Mixed-Effect Models
 
-#' @param  mod  Fitted lme4,nlme or glmmTMB model objects.
+#' @param  mod  Fitted lme4,nlme,glmmTMB or glm model objects.
 
 #' @details This function conducts hierarchical partitioning to calculate the individual contributions of each predictor towards marginal R2 for Generalized Mixed-effect Model. The marginal R2 is the output of r.squaredGLMM in MuMIn package.
 
@@ -30,11 +30,16 @@
 #'r.squaredGLMM(mod1)
 #'glmm.hp(mod1)
 #'plot(glmm.hp(mod1))
+#'mod2 <- glm(Sepal.Length ~ Petal.Length+Petal.Width,data = iris)
+#'r.squaredGLMM(mod2)
+#'glmm.hp(mod2)
+#'plot(glmm.hp(mod2))
+
 
 glmm.hp <- function(mod)
 {
   # initial checks
-  if (!inherits(mod, c("merMod","lme","glmmTMB"))) stop("glmm.hp only supports lme, merMod or glmmTMB objects at the moment")
+  if (!inherits(mod, c("merMod","lme","glmmTMB","glm"))) stop("glmm.hp only supports lme, merMod, glmmTMB or glm objects at the moment")
   if(inherits(mod, "merMod"))
   {# interaction checks
   Formu <- strsplit(as.character(mod@call$formula)[3],"")[[1]]
@@ -56,6 +61,13 @@ glmm.hp <- function(mod)
   if("*"%in%Formu|":"%in%Formu)stop("Please put the interaction term as a new variable (i.e. the product of the variables) and put it and avoid the asterisk (*) and colon(:) in the original model")
    varname <- strsplit(strsplit(as.character(mod$call$formula)[3],"(",fixed=T)[[1]][1]," ")[[1]]
   ivname <- varname[seq(1,length(varname),2)]
+  }
+ 
+    if(inherits(mod, "glm"))
+  {# interaction checks
+  Formu <- strsplit(as.character(mod$call$formula)[3],"")[[1]]
+  if("*"%in%Formu|":"%in%Formu)stop("Please put the interaction term as a new variable (i.e. the product of the variables) and put it and avoid the asterisk (*) and colon(:) in the original model")
+  ivname=attr(mod$terms, "term.labels") 
   }
    
   
@@ -94,7 +106,8 @@ if(inherits(mod, "lme"))
 mod_null <- stats::update(object = mod,data=dat,fixed=~1)
 }
 
-if(inherits(mod, "glmmTMB"))
+
+if(inherits(mod, c("glmmTMB","glm")))
 {dat <- na.omit(eval(mod$call$data))
 if(!inherits(dat, "data.frame")){stop("Please change the name of data object in the original (g)lmm analysis then try again.")}
 to_del <- paste(paste("-", iv.name, sep= ""), collapse = " ")
@@ -121,7 +134,11 @@ for (k in 1:nr2type)
 	{to_add <- paste("~",paste(tmp.name,collapse = " + "),sep=" ")
 	  modnew  <- stats::update(object = mod_null, data = dat,fixed=to_add) 
 	}
-	
+	 
+	if(inherits(mod, "glm"))
+    {to_add <- paste("~",paste(tmp.name,collapse = " + "),sep=" ")
+    modnew  <- stats::update(object = mod_null, data = dat,to_add) 
+    }
 	commonM[i, 2]  <- MuMIn::r.squaredGLMM(modnew)[k,1]
   }
 
