@@ -4,6 +4,7 @@
 #' @param  plot.perc Logical;if TRUE, the bar plot (based on ggplot2 package) of the percentage to individual effects of variables or groups towards total explained variation, the default is FALSE to show plot with original individual effects.
 #' @param color Color of variables.
 #' @param  n Integer; which marginal R2 in output of r.squaredGLMM to plot. 
+#' @param  dig Integer; number of decimal places in Venn diagram. 
 #' @param ... unused
 #' @return a ggplot object
 #' @author {Jiangshan Lai} \email{lai@njfu.edu.cn}
@@ -12,12 +13,13 @@
 #' library(MuMIn)
 #' library(lme4)
 #' mod1 <- lmer(Sepal.Length ~ Petal.Length + Petal.Width +(1 | Species), data = iris)
-#' plot(glmm.hp(mod1))
+#' a <- glmm.hp(mod1)
+#' plot(a)
 #' mod3 <- lm(Sepal.Length ~ Petal.Length+Petal.Width,data = iris)
 #' plot(glmm.hp(mod3,type="R2"))
-#' plot(glmm.hp(mod3,commonality=TRUE))
+#' plot(glmm.hp(mod3,commonality=TRUE),color = c("#8DD3C7", "#FFFFB3"))
 
-plot.glmmhp <- function(x, plot.perc = FALSE, color = NULL,n = 1,...){
+plot.glmmhp <- function(x, plot.perc = FALSE, color = NULL,n = 1,dig = 4,...){
   if (!inherits(x, "glmmhp")){
     stop("x should be the output of glmm.hp()")
   }
@@ -39,7 +41,7 @@ if(x$type=="commonality.analysis")
 { 
   Var.part <- as.data.frame(x[[n+1]])
   #Var.part <- Var.part[which(Var.part$Fractions >=cutoff), ]
-  Var.part$Fractions <- round(Var.part$Fractions,3)
+  Var.part$Fractions <- round(Var.part$Fractions,dig)
   nvar <- length(x$variables)
   Constrained <- Var.part$Fractions[2^nvar]
   if (!nvar%in% 2:4)
